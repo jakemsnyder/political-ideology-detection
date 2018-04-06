@@ -90,7 +90,7 @@ def readPDFFile(filePath):
                 for layoutObject in layout:
                     if isinstance(layoutObject, LTTextContainer):
                         text = layoutObject.get_text()
-                        text = text.replace('\n', '').replace('(cid:173)', '')
+                        text = text.replace('\n', '')
                         extracted_text[pageNumber] += text
                     # elif isinstance(layoutObject, LTItem):
                     #     something = layoutObject.__getattribute__()

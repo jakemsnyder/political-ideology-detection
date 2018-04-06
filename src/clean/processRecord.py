@@ -14,15 +14,21 @@ def saveDataFramesAsCSV(dataframe, savePath):
     dataframe.to_csv(savePath)
 
 
+def cleanText(text):
+    badPhrasesRE = re.compile("\\u00b7|\\u2022|\(cid:173\)")
+    text = re.sub(badPhrasesRE, "", text)
+    return text
+
+
 speakerRE = re.compile(
-    "Mr\. [A-Z ]{2,}\."
-    "|Mrs\. [A-Z ]{2,}\."
+    "M[rs]{1,2}\.\s[A-Z]{2,}\s[A-Z]\.\s[A-Z]{2,}\."
+    "|M[rs]{1,2}\.\s[A-Z ]{2,}\."
     "|The VICE PRESIDENT."
     "|The PRESIDENT."
-    "|Mr\. SPEAKER"
+    "|M[rs]{1,2}\. SPEAKER"
     "|The PRESIDING OFFICER."
-    "|Mr\. [A-Z ]{2,} of [A-Z][a-z]+\."
-    "|STATEMENT BY [ A-Z]{2,}\s"
+    "|M[rs]{1,2}\. [A-Z ]{2,} of [A-Z][a-z]+\."
+    # "|STATEMENT BY [ A-Z]{2,}\s"
 )
 
 startingYear = 1974
@@ -36,6 +42,9 @@ for year in range(startingYear, endingYear + 1):
         yearlyResults = []
         for part, pageDict in partDict.items():
             for page, text in pageDict.items():
+
+                text = cleanText(text)
+
                 speakers = re.findall(speakerRE, text)
                 speeches = speakerRE.split(text)
 
