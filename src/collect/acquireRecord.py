@@ -8,7 +8,7 @@ from pdfminer.pdfdevice import PDFDevice
 from pdfminer.pdfparser import PDFParser, PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
-from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTTextContainer, LTLine, LTItem
 from pip._vendor import requests
 
 logging.propagate = False
@@ -67,29 +67,34 @@ def readPDFFile(filePath):
     print('About to parse URL at path: {:s}'.format(filePath))
 
     with open(filePath, 'rb') as pdfFile:
-        parser = PDFParser(pdfFile)
-        doc = PDFDocument()
-        parser.set_document(doc)
-        doc.set_parser(parser)
-        doc.initialize('')
-        rsrcmgr = PDFResourceManager()
-        laparams = LAParams()
-        laparams.char_margin = 1.0
-        laparams.word_margin = 1.0
-        device = PDFPageAggregator(rsrcmgr, laparams=laparams)
-        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        pdfParser = PDFParser(pdfFile)
+        document = PDFDocument()
+        pdfParser.set_document(document)
+        document.set_parser(pdfParser)
+
+        document.initialize('')
+        pdfResourceManager = PDFResourceManager()
+        laParams = LAParams()
+        laParams.char_margin = 1.0
+        laParams.word_margin = 1.0
+        pdfPageAggregator = PDFPageAggregator(pdfResourceManager, laparams=laParams)
+        pdfPageInterpreter = PDFPageInterpreter(pdfResourceManager, pdfPageAggregator)
         extracted_text = {}
 
         pageNumber = 1
-        for page in doc.get_pages():
+        for page in document.get_pages():
             if pageNumber % 50 == 4:
-                interpreter.process_page(page)
-                layout = device.get_result()
-                for lt_obj in layout:
-                    if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
-                        text = lt_obj.get_text()
+                extracted_text[pageNumber] = ''
+                pdfPageInterpreter.process_page(page)
+                layout = pdfPageAggregator.get_result()
+                for layoutObject in layout:
+                    if isinstance(layoutObject, LTTextContainer):
+                        text = layoutObject.get_text()
                         text = text.replace('\n', '').replace('(cid:173)', '')
-                        extracted_text[pageNumber] = text
+                        extracted_text[pageNumber] += text
+                    # elif isinstance(layoutObject, LTItem):
+                    #     something = layoutObject.__getattribute__()
+
             pageNumber += 1
 
         print('URL parse complete')
@@ -127,7 +132,9 @@ startingYear = 1974
 endingYear = 1974  # 2018
 for year in range(startingYear, endingYear + 1):
 
-    rawData[year] = {}
+    rawData = {
+        year: {}
+    }
 
     startingPartNumber = 1
     # endingPartNumber = 2
@@ -139,12 +146,8 @@ for year in range(startingYear, endingYear + 1):
         textPageDict = readPDFFile(filePath)
         rawData[year][partNumber] = textPageDict
 
-print('')
-print('')
-print(rawData)
-
-savePath = '../../data/json/raw/raw_json-{:d}-{:d}.json'.format(startingYear, endingYear)
-saveDictAsJson(rawData, savePath)
+    savePath = '../../data/json/raw/raw_json-{:d}.json'.format(year)
+    saveDictAsJson(rawData, savePath)
 
 endTimeAcquireData = time()
 print('Total time to acquire data was {:f} minutes'.format((endTimeAcquireData - startTimeAcquireData) / 60))
