@@ -21,18 +21,20 @@ def cleanText(text):
 
 
 speakerRE = re.compile(
-    "M[rs]{1,2}\.\s[A-Z]{2,}\s[A-Z]\.\s[A-Z]{2,}\."
-    "|M[rs]{1,2}\.\s[A-Z ]{2,}\."
-    "|The VICE PRESIDENT."
-    "|The PRESIDENT."
-    "|M[rs]{1,2}\. SPEAKER"
-    "|The PRESIDING OFFICER."
-    "|M[rs]{1,2}\. [A-Z ]{2,} of [A-Z][a-z]+\."
+    "M[rs]{1,2}\.\s+[A-Z]{2,}\s+[A-Z]\.\s+[A-Z]{2,}\."
+    "|M[rs]{1,2}\.\s+[A-Z ]{2,}\."
+    "|The\s+VICE\s+PRESIDENT\."
+    "|The\s+PRESIDENT\."
+    "|M[rs]{1,2}\.\s+SPEAKER\."
+    "|The\s+PRESIDING\s+OFFICER\."
+    "|The\s+SPEAKER\s+pro\s+tempore\."
+    "|The\s+Acting\s+CHAIR\."
+    "|M[rs]{1,2}\.\s+[A-Z ]{2,}\s+of\s+[A-Z][a-z]+\."
     # "|STATEMENT BY [ A-Z]{2,}\s"
 )
 
-startingYear = 1974
-endingYear = 1974  # 2018
+startingYear = 2011
+endingYear = 2011  # 2018
 
 for year in range(startingYear, endingYear + 1):
 
