@@ -168,7 +168,7 @@ for year in range(startingYear, endingYear + 1):
                 recordDateString = str(recordDate)[:10]
                 rawData[year][recordDateString] = textPageDict
 
-                daysUntilNextRecordDate = random.randint(6, 12)
+                daysUntilNextRecordDate = random.randint(4, 9)
             except (PDFSyntaxError, FileNotFoundError):
                 print('{:s} doesnt have data'.format(str(recordDate)))
 
