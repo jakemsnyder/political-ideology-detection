@@ -71,7 +71,7 @@ def downloadPDFFile(recordURL, year, partNumber=None, date=None):
     return fileSavePath
 
 
-def parsePDFFile(filePath, everyNPages=30):
+def parsePDFFile(filePath, everyNPages=13):
     print('')
     print('About to parse file at path: {:s}'.format(filePath))
 
