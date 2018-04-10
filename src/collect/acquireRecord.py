@@ -72,7 +72,7 @@ def downloadPDFFile(recordURL, year, partNumber=None, date=None):
 
 def parsePDFFile(filePath, everyNPages=30):
     print('')
-    print('About to parse URL at path: {:s}'.format(filePath))
+    print('About to parse file at path: {:s}'.format(filePath))
 
     with open(filePath, 'rb') as pdfFile:
         pdfParser = PDFParser(pdfFile)
@@ -91,19 +91,21 @@ def parsePDFFile(filePath, everyNPages=30):
 
         pageNumber = 1
         chosenStoppingPage = random.randint(3, 10)
-        for page in document.get_pages():
-            if pageNumber % everyNPages == chosenStoppingPage:
-                extracted_text[pageNumber] = ''
-                pdfPageInterpreter.process_page(page)
-                layout = pdfPageAggregator.get_result()
-                for layoutObject in layout:
-                    if isinstance(layoutObject, LTTextContainer):
-                        text = layoutObject.get_text()
-                        text = text.replace('-\n', '')
-                        text = text.replace('\n', ' ')
-                        extracted_text[pageNumber] += text
-
-            pageNumber += 1
+        try:
+            for page in document.get_pages():
+                if pageNumber % everyNPages == chosenStoppingPage:
+                    extracted_text[pageNumber] = ''
+                    pdfPageInterpreter.process_page(page)
+                    layout = pdfPageAggregator.get_result()
+                    for layoutObject in layout:
+                        if isinstance(layoutObject, LTTextContainer):
+                            text = layoutObject.get_text()
+                            text = text.replace('-\n', '')
+                            text = text.replace('\n', ' ')
+                            extracted_text[pageNumber] += text
+                pageNumber += 1
+        except KeyError:
+            pass
 
         print('URL parse complete')
 
@@ -141,7 +143,7 @@ rawData = {}
 # }
 
 startingYear = 2011 # First year of data
-endingYear = 2011 # Last year of data
+endingYear = 2018 # Last year of data
 for year in range(startingYear, endingYear + 1):
 
     startTimeAcquireData = time()
