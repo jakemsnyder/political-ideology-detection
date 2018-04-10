@@ -34,7 +34,7 @@ speakerRE = re.compile(
 )
 
 startingYear = 2011
-endingYear = 2011  # 2018
+endingYear = 2018  # 2018
 
 for year in range(startingYear, endingYear + 1):
 

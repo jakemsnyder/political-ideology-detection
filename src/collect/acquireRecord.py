@@ -4,6 +4,7 @@ import logging
 import os
 from datetime import datetime, timedelta
 from time import time, sleep
+from pandas.tseries.offsets import BDay
 import random
 
 random.seed(42)
@@ -90,7 +91,7 @@ def parsePDFFile(filePath, everyNPages=30):
         extracted_text = {}
 
         pageNumber = 1
-        chosenStoppingPage = random.randint(3, 10)
+        chosenStoppingPage = random.randint(1, everyNPages-1)
         try:
             for page in document.get_pages():
                 if pageNumber % everyNPages == chosenStoppingPage:
@@ -157,23 +158,23 @@ for year in range(startingYear, endingYear + 1):
         firstDateOfYear = datetime.strptime('01/01/{:d}'.format(year), '%m/%d/%Y')
 
         daysUntilStartingDay = random.randint(0, 5)
-        recordDate = firstDateOfYear + timedelta(days=daysUntilStartingDay)
+        recordDate = firstDateOfYear + BDay(daysUntilStartingDay)
         while recordDate.year == year:
             recordURL = getCongressionalRecordURL(year, date=recordDate)
             try:
                 filePath = downloadPDFFile(recordURL, year, date=recordDate)
-                textPageDict = parsePDFFile(filePath, everyNPages=8)
+                textPageDict = parsePDFFile(filePath, everyNPages=7)
 
                 recordDateString = str(recordDate)[:10]
                 rawData[year][recordDateString] = textPageDict
 
-                daysUntilNextRecordDate = random.randint(7, 15)
+                daysUntilNextRecordDate = random.randint(6, 12)
             except (PDFSyntaxError, FileNotFoundError):
                 print('{:s} doesnt have data'.format(str(recordDate)))
 
-                daysUntilNextRecordDate = random.randint(1,3)
+                daysUntilNextRecordDate = random.randint(1,2)
 
-            recordDate = recordDate + timedelta(days=daysUntilNextRecordDate)
+            recordDate = recordDate + BDay(daysUntilNextRecordDate)
     else:
         startingPartNumber = random.randint(1, 3)
         endingPartNumber = 33
