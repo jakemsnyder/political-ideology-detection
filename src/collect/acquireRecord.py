@@ -1,4 +1,3 @@
-# import pdfminer3k as pdfminer
 import json
 import logging
 import os
@@ -9,6 +8,7 @@ import random
 
 random.seed(42)
 
+# Note: Install pdfminer by installing pdfminer3k
 from pdfminer.pdfdevice import PDFDevice
 from pdfminer.pdfparser import PDFParser, PDFDocument, PDFSyntaxError
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
@@ -183,11 +183,14 @@ for year in range(startingYear, endingYear + 1):
         while partNumber <= endingPartNumber:
             recordURL = getCongressionalRecordURL(year, partNumber=partNumber)
             filePath = downloadPDFFile(recordURL, year, partNumber=partNumber)
-            textPageDict = parsePDFFile(filePath)
+            try:
+                textPageDict = parsePDFFile(filePath)
+                rawData[year][partNumber] = textPageDict
 
-            rawData[year][partNumber] = textPageDict
-
-            partNumber += random.randint(4, 8)
+                partNumber += random.randint(4, 8)
+            except (PDFSyntaxError, FileNotFoundError):
+                print('Part {:d} doesnt have data'.format(partNumber))
+                partNumber += random.randint(1,2)
 
     savePath = '../../data/json/raw/raw_json-{:d}.json'.format(year)
     saveDictAsJson(rawData, savePath)
