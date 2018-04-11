@@ -143,10 +143,11 @@ rawData = {}
 #     }
 # }
 
-startingYear = 2011 # First year of data
-endingYear = 2018 # Last year of data
+startingYear = 1974 # First year of data
+endingYear = 1982 # Last year of data
 for year in range(startingYear, endingYear + 1):
 
+    makeDirectory(year)
     startTimeAcquireData = time()
 
     rawData = {
@@ -154,7 +155,6 @@ for year in range(startingYear, endingYear + 1):
     }
 
     if year >= 1999:
-        makeDirectory(year)
         firstDateOfYear = datetime.strptime('01/01/{:d}'.format(year), '%m/%d/%Y')
 
         daysUntilStartingDay = random.randint(0, 5)
