@@ -99,3 +99,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+.idea/
+
+# json and pdf files
+data/json/
+data/pdf/
