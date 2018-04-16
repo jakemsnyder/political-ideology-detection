@@ -27,6 +27,7 @@ def removeAllButLetters(word):
     regex = re.compile('[^a-zA-Z]')
     return regex.sub('', word)
 
+
 def removeAllButLettersAndApostrophes(word):
     regex = re.compile("[^a-zA-Z']")
     return regex.sub('', word)
@@ -46,7 +47,7 @@ def getIdeologyFromSpeaker(speaker, year, chamber, congressID):
     lastNameRE1 = re.compile("M[rs]{1,2}\.\s+[A-Z ']{2,}\.")
     lastNameRE2 = re.compile("M[rs]{1,2}\.\s+[A-Z]{2,}\s+of\s+[A-Za-z ]+\.")
     lastNameRE3 = re.compile("M[rs]{1,2}\.\s+[A-Z]{2,}\s+[A-Z]{2,}\s+of\s+[A-Za-z ]+\.")
-    if lastNameRE1.match(speaker): # Mr. DISNEY. or Mr. WALT DISNEY.
+    if lastNameRE1.match(speaker):  # Mr. DISNEY. or Mr. WALT DISNEY.
         split = speaker.split(" ")
 
         lastName = split[len(split) - 1]
@@ -58,7 +59,7 @@ def getIdeologyFromSpeaker(speaker, year, chamber, congressID):
         if len(split) > 2:
             firstName = split[1]
             firstName = removeAllButLetters(firstName)
-    elif lastNameRE2.match(speaker): # Mr. DISNEY of Florida. or Mr. DISNEY of New York.
+    elif lastNameRE2.match(speaker):  # Mr. DISNEY of Florida. or Mr. DISNEY of New York.
         split = speaker.split(" ")
 
         lastName = split[1]
@@ -70,7 +71,7 @@ def getIdeologyFromSpeaker(speaker, year, chamber, congressID):
 
         prefix = split[0]
         gender = getGenderFromPrefix(prefix)
-    elif lastNameRE3.match(speaker): # Mr. WALT DISNEY of Florida. or Mr. WALT DISNEY of New York.
+    elif lastNameRE3.match(speaker):  # Mr. WALT DISNEY of Florida. or Mr. WALT DISNEY of New York.
         split = speaker.split(" ")
 
         lastName = split[1]
@@ -122,9 +123,6 @@ speakerRE = re.compile(
     # "|STATEMENT BY [ A-Z]{2,}\s"
 )
 
-startingYear = 1974
-endingYear = 1974  # 2018
-
 
 def extractChamberFromText(text):
     if 'HOUSE' in text[:50]:
@@ -146,6 +144,8 @@ def getCongressIDFromYear():
     return int(np.ceil(int(year) / 2 - 894))
 
 
+startingYear = 2015
+endingYear = 2018
 for year in range(startingYear, endingYear + 1):
 
     speakerYearBranchSet = set()

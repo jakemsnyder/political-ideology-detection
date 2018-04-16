@@ -145,8 +145,8 @@ rawData = {}
 #     }
 # }
 
-startingYear = 1979  # First year of data
-endingYear = 1982  # Last year of data
+startingYear = 2015  # First year of data
+endingYear = 2015  # Last year of data
 for year in range(startingYear, endingYear + 1):
 
     makeDirectory(year)
