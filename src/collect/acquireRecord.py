@@ -91,7 +91,7 @@ def parsePDFFile(filePath, everyNPages=13):
         extracted_text = {}
 
         pageNumber = 1
-        chosenStoppingPage = random.randint(1, everyNPages-1)
+        chosenStoppingPage = random.randint(1, everyNPages - 1)
         try:
             for page in document.get_pages():
                 if pageNumber % everyNPages == chosenStoppingPage:
@@ -126,10 +126,12 @@ def countPagesCollected(rawData):
             count += len(pageDict)
     return count
 
+
 def makeDirectory(year):
     path = '../../data/pdf/{:d}/'.format(year)
     if not os.path.exists(path):
         os.makedirs(path)
+
 
 rawData = {}
 
@@ -143,8 +145,8 @@ rawData = {}
 #     }
 # }
 
-startingYear = 1974 # First year of data
-endingYear = 1982 # Last year of data
+startingYear = 1979  # First year of data
+endingYear = 1982  # Last year of data
 for year in range(startingYear, endingYear + 1):
 
     makeDirectory(year)
@@ -172,7 +174,7 @@ for year in range(startingYear, endingYear + 1):
             except (PDFSyntaxError, FileNotFoundError):
                 print('{:s} doesnt have data'.format(str(recordDate)))
 
-                daysUntilNextRecordDate = random.randint(1,2)
+                daysUntilNextRecordDate = random.randint(1, 2)
 
             recordDate = recordDate + BDay(daysUntilNextRecordDate)
     else:
@@ -190,11 +192,12 @@ for year in range(startingYear, endingYear + 1):
                 partNumber += random.randint(4, 8)
             except (PDFSyntaxError, FileNotFoundError):
                 print('Part {:d} doesnt have data'.format(partNumber))
-                partNumber += random.randint(1,2)
+                partNumber += random.randint(1, 2)
 
     savePath = '../../data/json/raw/raw_json-{:d}.json'.format(year)
     saveDictAsJson(rawData, savePath)
 
     endTimeAcquireData = time()
-    print('Total time to acquire data for {:d} was {:f} minutes'.format(year, (endTimeAcquireData - startTimeAcquireData) / 60))
+    print('Total time to acquire data for {:d} was {:f} minutes'.format(year, (
+    endTimeAcquireData - startTimeAcquireData) / 60))
     print('Total pages collected: {:d}'.format(countPagesCollected(rawData)))
