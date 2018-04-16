@@ -144,7 +144,7 @@ def getCongressIDFromYear():
     return int(np.ceil(int(year) / 2 - 894))
 
 
-startingYear = 2015
+startingYear = 1974
 endingYear = 2018
 for year in range(startingYear, endingYear + 1):
 

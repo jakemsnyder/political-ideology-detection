@@ -4,6 +4,8 @@ from pymongo import MongoClient
 
 from src.util.util import connectToMongo
 
+databaseName = 'politics'
+memberCollection = 'voteview_members'
 stateAbbreviationsMap = {
     "alabama": "AL",
     "alaska": "AK",
@@ -59,10 +61,11 @@ stateAbbreviationsMap = {
 
 
 def findIdeologyScore(lastName, firstName=None, state=None, congressID=None, year=None, gender=None, chamber=None):
-    mongoCollection = connectToMongo('politics', 'voteview_members')
+    mongoCollection = connectToMongo(databaseName, memberCollection)
 
     query = {
-        "fname": {
+        "bioname": {
+        # "fname": {
             # '$eq': lastName.upper()
             '$regex': lastName.upper() + '[,A-Za-z ]+'
         }
@@ -71,6 +74,8 @@ def findIdeologyScore(lastName, firstName=None, state=None, congressID=None, yea
         query['congress'] = {'$eq': int(congressID)}
     if chamber:
         query['chamber'] = {'$eq': chamber}
+    else:
+        query['chamber'] = {'$in': ['House', 'Senate']}
     if state:
         if state.lower() in stateAbbreviationsMap:
             stateAbbreviation = stateAbbreviationsMap[state.lower()]
@@ -97,6 +102,12 @@ def findIdeologyScore(lastName, firstName=None, state=None, congressID=None, yea
     matchRepresentative = None
     for result in results:
         if foundID:
+            if 'bioguide_id' not in result:
+                print('')
+                print(result)
+                print('')
+                print(matchRepresentative)
+                pass
             if foundID != result['bioguide_id']:
                 # print('multiple people for search')
                 return None
