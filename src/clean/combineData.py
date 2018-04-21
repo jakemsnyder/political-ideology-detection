@@ -7,7 +7,9 @@ from nltk.corpus import stopwords
 
 def makeStopwords():
     stopwordsNLTK = stopwords.words('english')
+    stopwordsNLTK.remove('not')
     stopwordsDomainSpecific = [
+        'l',
         'year',
         'speaker',
         'chairman',
