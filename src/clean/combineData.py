@@ -31,9 +31,11 @@ df['sentence'] = df['sentence'].str.replace('VerDate.*', '')
 df['sent_length'] = df['sentence'].str.len()
 df['caps_length'] = df['sentence'].str.findall('[A-Z]').str.len()
 df['letters_length'] = df['sentence'].str.findall('\w').str.len()
+df['numbers_length'] = df['sentence'].str.findall('\d').str.len()
 df['caps_prop'] = df['caps_length'] / df['letters_length']
-df = df.query('sent_length > 8 & caps_prop < .4'). \
-    drop(['sent_length', 'caps_length', 'letters_length', 'caps_prop'], axis=1)
+df['num_prop'] = df['numbers_length'] / df['sent_length']
+df = df.query('sent_length > 8 & caps_prop < .4 & num_prop < .5'). \
+    drop(['sent_length', 'caps_length', 'letters_length', 'caps_prop', 'numbers_length', 'num_prop'], axis=1)
 
 # df['period'] = pd.cut(df['year'], [1973, 1988, 2003, np.inf], labels=[1, 2, 3])
 
