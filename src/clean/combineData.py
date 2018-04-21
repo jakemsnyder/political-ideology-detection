@@ -1,5 +1,37 @@
 import pandas as pd
 import glob
+import re
+
+from nltk import PorterStemmer
+from nltk.corpus import stopwords
+
+def makeStopwords():
+    stopwordsNLTK = stopwords.words('english')
+    stopwordsDomainSpecific = [
+        'year',
+        'speaker',
+        'chairman',
+    ]
+    return stopwordsNLTK + stopwordsDomainSpecific
+
+REGEX_TO_SPACE = re.compile('-+')
+REGEX_TO_REMOVE = re.compile('[^a-zA-Z ]+')
+REGEX_SPACES = re.compile('\s+')
+STOPWORDS = makeStopwords()
+
+PORTER_STEMMER = PorterStemmer()
+
+def cleanSentence(sentence):
+    sentence = re.sub(REGEX_TO_SPACE, ' ', sentence)
+    sentence = re.sub(REGEX_TO_REMOVE, '', sentence)
+    sentence = sentence.lower().strip()
+    words = re.split(REGEX_SPACES, sentence)
+    words = [PORTER_STEMMER.stem(word) for word in words if word not in STOPWORDS]
+    if words:
+        sentence = ' '.join(words)
+    else:
+        sentence = ''
+    return sentence
 
 files = glob.glob("../../data/csv/processed/record*.csv")
 data = pd.concat([pd.read_csv(f, index_col=0) for f in files], keys=files, ignore_index=True)
@@ -8,13 +40,15 @@ remove_speakers = ['The PRESIDING OFFICER.',
                    'The SPEAKER pro tempore.']
 data = data[~data.speaker.isin(remove_speakers)]
 
-data['speech'] = data['speech'].str.replace('Mr\.', 'Mr')
-data['speech'] = data['speech'].str.replace('Mrs\.', 'Mrs')
-data['speech'] = data['speech'].str.replace('Ms\.', 'Ms')
-data['speech'] = data['speech'].str.replace('\s+', ' ')
-data['speech'] = data['speech'].str.replace('a\.m\. ', 'am ')
-data['speech'] = data['speech'].str.replace('p\.m\. ', 'pm ')
-data['speech'] = data['speech'].str.replace('H\.R\. ', 'HR ')
+# data['speech'] = data['speech'].str.replace('Mr\.', 'Mr')
+# data['speech'] = data['speech'].str.replace('Mrs\.', 'Mrs')
+# data['speech'] = data['speech'].str.replace('Ms\.', 'Ms')
+# data['speech'] = data['speech'].str.replace('Dr\.', 'Dr')
+# data['speech'] = data['speech'].str.replace('a\.m\. ', 'am ')
+# data['speech'] = data['speech'].str.replace('p\.m\. ', 'pm ')
+# data['speech'] = data['speech'].str.replace('H\.R\. ', 'HR ')
+wordsWithPeriodsRegex = 'Mr\.|Mrs\.|Ms\.|Dr\.|a\.m\.|p\.m\.|H\.R\.'
+data['speech'] = data['speech'].str.replace('wordsWithPeriodsRegex', '')
 
 sentences = pd.concat([data['speech'].str.split('\. ', expand=True)])
 df = pd.concat([data, sentences], axis=1). \
@@ -38,5 +72,8 @@ df = df.query('sent_length > 8 & caps_prop < .4 & num_prop < .5'). \
     drop(['sent_length', 'caps_length', 'letters_length', 'caps_prop', 'numbers_length', 'num_prop'], axis=1)
 
 # df['period'] = pd.cut(df['year'], [1973, 1988, 2003, np.inf], labels=[1, 2, 3])
+
+df['sentence'] = df['sentence'].apply(cleanSentence)
+df = df[df['sentence'] != '']
 
 df.to_csv('../../data/csv/model/train.csv', index=False)
