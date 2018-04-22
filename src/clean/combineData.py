@@ -81,7 +81,7 @@ df = df.query('sent_length > 8 & caps_prop < .4 & num_prop < .5'). \
 df['sentence'] = df['sentence'].apply(cleanSentence)
 df = df[df['sentence'] != '']
 
-train, validate, test = np.split(df.sample(frac=1), [int(.6*len(df)), int(.8*len(df))])
+train, test = np.split(df.sample(frac=1), [int(.8*len(df))])
 
 # count = df.groupby(['year']).agg({'sentence': 'count'})
 # countTrain = train.groupby(['year']).agg({'sentence': 'count'})
@@ -89,5 +89,4 @@ train, validate, test = np.split(df.sample(frac=1), [int(.6*len(df)), int(.8*len
 # countTest = test.groupby(['year']).agg({'sentence': 'count'})
 
 train.to_csv('../../data/csv/model/train.csv', index=False)
-validate.to_csv('../../data/csv/model/validate.csv', index=False)
 test.to_csv('../../data/csv/model/test.csv', index=False)
