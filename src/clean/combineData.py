@@ -1,6 +1,9 @@
 import pandas as pd
+import numpy as np
 import glob
 import re
+
+np.random.seed(42)
 
 from nltk import PorterStemmer
 from nltk.corpus import stopwords
@@ -78,4 +81,13 @@ df = df.query('sent_length > 8 & caps_prop < .4 & num_prop < .5'). \
 df['sentence'] = df['sentence'].apply(cleanSentence)
 df = df[df['sentence'] != '']
 
-df.to_csv('../../data/csv/model/train.csv', index=False)
+train, validate, test = np.split(df.sample(frac=1), [int(.6*len(df)), int(.8*len(df))])
+
+# count = df.groupby(['year']).agg({'sentence': 'count'})
+# countTrain = train.groupby(['year']).agg({'sentence': 'count'})
+# countValidate = validate.groupby(['year']).agg({'sentence': 'count'})
+# countTest = test.groupby(['year']).agg({'sentence': 'count'})
+
+train.to_csv('../../data/csv/model/train.csv', index=False)
+validate.to_csv('../../data/csv/model/validate.csv', index=False)
+test.to_csv('../../data/csv/model/test.csv', index=False)
