@@ -16,6 +16,9 @@ def makeStopwords():
         'year',
         'speaker',
         'chairman',
+        'mr',
+        'mrs',
+        'also',
     ]
     return stopwordsNLTK + stopwordsDomainSpecific
 
