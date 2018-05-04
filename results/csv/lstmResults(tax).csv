@@ -1,0 +1,2 @@
+batchSize,embeddingVectorLength,epochs,lstmLayerSize,maxSentenceLength,testAccuracy,testMSE,timeTaken,trainAccuracy,trainMSE
+128,50,3,100,200,0.5988735919899875,0.16659840526792988,89.98782706260681,0.8730721776681061,0.06652161549404452

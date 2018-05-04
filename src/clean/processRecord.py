@@ -112,6 +112,7 @@ speakerRE = re.compile(
     # "|M[rs]{1,2}\.\s+[A-Z]{2,}\s[A-Z']{2,}\."
     "|The\s+VICE\s+PRESIDENT\."
     "|The\s+PRESIDENT\."
+    "|The\s+CHIEF\s+JUSTICE\."
     "|M[rs]{1,2}\.\s+Chairman\."
     "|M[rs]{1,2}\.\s+Chair\."
     "|M[rs]{1,2}\.\s+SPEAKER\."

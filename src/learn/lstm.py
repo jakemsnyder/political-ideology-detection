@@ -13,13 +13,21 @@ from sklearn.metrics import mean_squared_error, accuracy_score
 from sklearn.model_selection import KFold
 
 MODEL_PATH = '../../data/binary/word2Vec.bin'
-TRAINING_DATA_PATH = '../../data/csv/model/train.csv'
+# TRAINING_DATA_PATH = '../../data/csv/model/train.csv'
+# TEST_DATA_PATH = '../../data/csv/model/test.csv'
 # TRAINING_DATA_PATH = '../../data/csv/model/trainFAKEDATA.csv'
-TEST_DATA_PATH = '../../data/csv/model/test.csv'
+TRAINING_DATA_PATH = '../../data/csv/model/trainPolitical.csv'
+TEST_DATA_PATH = '../../data/csv/model/testPolitical.csv'
+# TRAINING_DATA_PATH = '../../data/csv/model/trainAbortion.csv'
+# TEST_DATA_PATH = '../../data/csv/model/testAbortion.csv'
+# TRAINING_DATA_PATH = '../../data/csv/model/trainModern.csv'
+# TEST_DATA_PATH = '../../data/csv/model/testModern.csv'
 DEBATE_DATA_PATH = '../../data/csv/processed/debate_sentences_part1.csv'
-RESULT_PATH = '../../results/csv/lstmParameters.csv'
+RESULT_PATH = '../../results/csv/lstmParameters(topic modelling).csv'
 RESULT_FINAL_PATH = '../../results/csv/lstmResults.csv'
-RESULT_DEBATE_FINAL_PATH = '../../results/csv/lstmDebate.csv'
+# RESULT_DEBATE_FINAL_PATH = '../../results/csv/lstmDebate.csv'
+RESULT_DEBATE_FINAL_PATH = '../../results/csv/lstmDebate2.csv'
+DIFFERENCES_PATH = '../../results/csv/worstMistakes.csv'
 
 
 def saveWord2VecModel(savePath, model):
@@ -92,6 +100,7 @@ dataTest = pd.read_csv(TEST_DATA_PATH)
 dataDebate = pd.read_csv(DEBATE_DATA_PATH)
 totalTime = time() - start
 print('Training Data Loaded')
+print('Number of Training/Validation sentences: {:d}'.format(len(dataTrain)))
 if totalTime > 60:
     print('Took {:f} minutes'.format(totalTime / 60))
 else:
@@ -187,8 +196,6 @@ def runBestModel(XTrainValidate, yTrainValidate, XTest, yTest, XDebate):
     batchSize = 128
     epochs = 3
 
-    results = {}
-
     XTrainValidate = sequence.pad_sequences(XTrainValidate, maxlen=maxSentenceLength)
     XTest = sequence.pad_sequences(XTest, maxlen=maxSentenceLength)
     XDebate = sequence.pad_sequences(XDebate, maxlen=maxSentenceLength)
@@ -222,6 +229,50 @@ def runBestModel(XTrainValidate, yTrainValidate, XTest, yTest, XDebate):
     print('')
     print('Train MSE: {:f}'.format(mseTrain))
     print('Test MSE: {:f}'.format(mseTest))
+
+    differences = []
+    for i in range(len(predictionsTest)):
+        predicted = predictionsTest[i][0]
+        actual = yTest[i]
+        difference = predicted - actual
+        differences.append((i, difference, predicted, actual))
+
+    differences.sort(key=lambda x: x[1])
+
+    differencesWorst = []
+    for j in range(20):
+        index, difference, predicted, actual = differences[j]
+        sentenceRaw = dataTrain.loc[index]['sentence_raw']
+        sentenceUnclean = dataTrain.loc[index]['sentence_unclean']
+        sentence = dataTrain.loc[index]['sentence']
+        differencesWorst.append({
+            "index": index,
+            "difference": difference,
+            "sentence1": sentenceRaw,
+            "sentence2": sentenceUnclean,
+            "sentence3": sentence,
+            "predicted": predicted,
+            "actual": actual
+        })
+    for j in range(20):
+        index, difference, predicted, actual = differences[len(differences) - j - 1]
+        sentenceRaw = dataTrain.loc[index]['sentence_raw']
+        sentenceUnclean = dataTrain.loc[index]['sentence_unclean']
+        sentence = dataTrain.loc[index]['sentence']
+        differencesWorst.append({
+            "index": index,
+            "difference": difference,
+            "sentence1": sentenceRaw,
+            "sentence2": sentenceUnclean,
+            "sentence3": sentence,
+            "predicted": predicted,
+            "actual": actual
+        })
+
+    differencesDF = pd.DataFrame(differencesWorst)
+    differencesDF.to_csv(DIFFERENCES_PATH, index=False)
+
+
 
     predictionsTrainBinary = np.apply_along_axis(mapToBinary, 1, predictionsTrain)
     predictionsTestBinary = np.apply_along_axis(mapToBinary, 1, predictionsTest)
@@ -277,14 +328,14 @@ def findBestParameters(XTrainValidate, yTrainValidate):
 
     modelParameters = {
         'embeddingVectorLength': [50],
-        'maxSentenceLength': [300],
-        'lstmLayerSize': [100],
+        'maxSentenceLength': [100, 200, 300],
+        'lstmLayerSize': [50, 100, 200],
         'batchSize': [128],
-        'epochs': [3],
+        'epochs': [2],
     }
 
     results = {}
-    kFolds = 5
+    kFolds = 3
     kFold = KFold(n_splits=kFolds, shuffle=True, random_state=72)
     for train_index, test_index in kFold.split(XTrainValidate):
         XTrain, XValidate = XTrainValidate[train_index], XTrainValidate[test_index]
@@ -379,5 +430,5 @@ def createLSTMModel(embeddingVectorLength, lstmLayerSize, maxSentenceLength):
     return model
 
 
-# findBestParameters(XTrainValidate, yTrainValidate)
-runBestModel(XTrainValidate, yTrainValidate, XTest, yTest, XDebate)
+findBestParameters(XTrainValidate, yTrainValidate)
+# runBestModel(XTrainValidate, yTrainValidate, XTest, yTest, XDebate)

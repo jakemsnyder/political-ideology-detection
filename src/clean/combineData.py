@@ -68,6 +68,8 @@ df = pd.melt(df, id_vars=['branch', 'congressID', 'ideology_score', 'page', 'par
     reset_index(). \
     drop(['variable', 'index'], axis=1)
 
+df['sentence_raw'] = df['sentence']
+
 df['sentence'] = df['sentence'].str.replace('VerDate.*', '')
 
 df['sent_length'] = df['sentence'].str.len()
@@ -81,15 +83,11 @@ df = df.query('sent_length > 8 & caps_prop < .4 & num_prop < .5'). \
 
 # df['period'] = pd.cut(df['year'], [1973, 1988, 2003, np.inf], labels=[1, 2, 3])
 
+df['sentence_unclean'] = df['sentence']
 df['sentence'] = df['sentence'].apply(cleanSentence)
 df = df[df['sentence'] != '']
 
 train, test = np.split(df.sample(frac=1), [int(.8*len(df))])
-
-# count = df.groupby(['year']).agg({'sentence': 'count'})
-# countTrain = train.groupby(['year']).agg({'sentence': 'count'})
-# countValidate = validate.groupby(['year']).agg({'sentence': 'count'})
-# countTest = test.groupby(['year']).agg({'sentence': 'count'})
 
 train.to_csv('../../data/csv/model/train.csv', index=False)
 test.to_csv('../../data/csv/model/test.csv', index=False)
