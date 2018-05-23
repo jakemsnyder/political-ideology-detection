@@ -24,7 +24,7 @@ We formulated the problem as a supervised learning exercise and tried to predict
 2. Recurrent Neural Network (RNN) based models
 
 ### Bag of Words based models
-All the sentences were converted into their bag-ofwords representation to indicate word counts. The overall vocabulary of the corpus is over 200,000 words but most words are not frequent. We eliminated all stop-words and selected the top 8000 words for the modeling. These bag of words were weighted using Term Frequency Inverse Document Frequency (TF-IDF).
+All the sentences were converted into their bag-ofwords representation to indicate word counts. The overall vocabulary of the corpus is over 200,000 words but most words are not frequent. We eliminated all stop-words and selected the top 8000 words for the modeling. These bag of words were weighted using Term Frequency Inverse Document Frequency (TFIDF).
 
 We used two linear models using this TFIDF representation: Ridge Regression (L2 regularization) and Lasso (L1 regularization). We also tried Support Vector Machines (SVM) and Neural Networks but their results were not consistent. Hence we report only the results from the linear models.
 
@@ -42,7 +42,17 @@ The baseline for the model is an all-zeros prediction, i.e. we predict all sente
 Since this is a regression problem, all models were evaluated using the Mean Squared Error (MSE) metric. The model selection and the reported MSE scores for the models are based on 5-fold cross validation.
 
 ## Results
-![Model Results](results/model_scores.png)
+|Model|Score|
+|----|----|
+|Baseline|0.158|
+|TFIDF + Ridge|0.151|
+|TFIDF + Lasso|0.157|
+|**LSTM (all)**|**0.149**|
+|LSTM (modern)|0.181|
+|LSTM (taxes)|0.167|
+|LSTM (drugs)|0.168|
+|LSTM (political terms)|0.158|
+
 
 The Bag of words models barely beat the baseline score of 0.158. The LSTM for all sentences does relatively better at 0.149. The LSTMs trained and tested on sentences with specific keywords related to taxes, drugs, or political terms tend to perform poorly relative to the baseline. This is likely due to the relatively smaller data sizes.
 
